@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">宝山公交查询</string>
+    <string name="activity_label">公交车到了吗</string>
+    <string name="action_settings">Settings</string>
+</resources>
