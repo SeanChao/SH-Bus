@@ -26,6 +26,22 @@ public class BusInfoProcess {
 
     }
 
+    public static Bus[] getBusByUrl (String url){
+        //获取网页信息
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(url).get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //提取<li>标签中的公交信息并格式化
+        Elements li = doc.select("li");
+        String busInfo = li.text()+" ";
+        System.out.println(busInfo);
+        //尝试使用遍历字符串的形式对得到的信息进行匹配
+        return infoExtract(busInfoFormat(busInfo));
+    }
+
     public static void listAllBus() throws IOException {
         int counter = 0;
         String urlbase = "http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=bsq";
@@ -75,7 +91,7 @@ public class BusInfoProcess {
         return busInfoArray;
     }
 
-    public static void infoExtract( String [] busInfoArray) {
+    public static Bus[] infoExtract( String [] busInfoArray) {
         int busNum = busInfoArray.length;
         Bus[] busArray = new Bus[32];
 
@@ -118,10 +134,10 @@ public class BusInfoProcess {
             }
 
             //深生成Bus对象
-
-            Bus bus = new Bus(name,destination,timeTable,isRunning,arrivalTime);
+            Bus bus = new Bus(name,destination,timeTable,arrivalTime);
             busArray[i] = bus ;
         }
+        return busArray;
     }
 }
 

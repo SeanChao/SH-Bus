@@ -20,17 +20,19 @@
             android:layout_margin="15dp">
 
             <TextView
+                android:id="@+id/bus_line_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20dp"
                 android:textColor="#000000"
                 android:text="Line"/>
             <TextView
+                android:id="@+id/bus_destination_name"
                 android:layout_marginTop="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center|left"
-                android:text="Bus Stop"/>
+                android:text="Destination"/>
 
         </LinearLayout>
 
@@ -42,6 +44,7 @@
             android:gravity="right|center">
 
             <TextView
+                android:id="@+id/bus_arrival_time"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center"
