@@ -8,21 +8,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-
-    /*private Bus[] buses = {new Bus("Space1","Mars","24h","100years"),
-            new Bus("Space1","Mars","24h","100years"),
-            new Bus("Space1","Mars","24h","100years")} ; //实际运行时显示的Bus数组
-    */
 
     private Bus[] buses = new Bus[32];
 
@@ -46,53 +40,80 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //从BusInfoProcess中获取信息
-        buses = BusInfoProcess.getBusByUrl("http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=bsq022");
-
-        //adapterter
-        initBuses();
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 1);
-        recyclerView.setLayoutManager(layoutManager);
-        adapter = new BusAdapter(busList);
-        recyclerView.setAdapter(adapter);
-        //swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
-        //swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
-        /*swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
+        swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 refreshBuses();
             }
-        });*/
+        });
+
+        //从BusInfoProcess中获取信息
+        getOnlineBusInfo();
+
     }
 
-    /*private void refreshBuses() {
+    private void getOnlineBusInfo() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                buses = BusInfoProcess.getBusByUrl("http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=bsq022");
+                for (int i = 0; i < 32; i++) {
+                    System.out.println("Main:buses[" + i + "]=" + buses[i]);
+                }
+                showResponse();
+            }
+        }).start();
+
+    }
+
+    private void showResponse() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // 在这里进行UI操作，将结果显示到界面上
+                initBuses();
+                RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+                GridLayoutManager layoutManager = new GridLayoutManager(MainActivity.this, 1);
+                recyclerView.setLayoutManager(layoutManager);
+                adapter = new BusAdapter(busList);
+                recyclerView.setAdapter(adapter);
+            }
+        });
+    }
+
+    private void refreshBuses() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        initBuses();
+                        getOnlineBusInfo();
+
                         adapter.notifyDataSetChanged();
                         swipeRefresh.setRefreshing(false);
                     }
                 });
             }
         }).start();
-    }*/
+    }
 
     private void initBuses() {
         busList.clear();
-        for (int i = 0; i < 50; i++) {
-            Random random = new Random();
-            int index = random.nextInt(buses.length);
-            busList.add(buses[index]);
+        for (int i = 0; i < 32; i++) {
+            if (buses[i].getName().equals("")) {
+                boolean b = (buses[i] == null);
+                System.out.println("TEST:" + b);
+                break;
+            }
+            busList.add(buses[i]);
         }
     }
 

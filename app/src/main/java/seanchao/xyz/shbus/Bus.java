@@ -44,7 +44,6 @@ public class Bus {
 
     @Override
     public String toString() {
-        // TODO Auto-generated method stub
         System.out.print("输出公交信息["+"线路名："+this.name+" 方向："+this.destination+" 时间表："+this.timeTable+" ");
         String runningState = "ERROR";
         if(this.isRunning){
