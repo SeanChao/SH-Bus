@@ -1,4 +1,4 @@
-package seanchao.xyz.shbus;
+package xyz.seanchao.shbus;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

@@ -1,4 +1,4 @@
-package seanchao.xyz.shbus;
+package xyz.seanchao.shbus;
 
 /**
  * Created by SeanC on 2018/2/13.
@@ -13,7 +13,9 @@ import org.jsoup.select.Elements;
 public class BusInfoProcess {
 
     public static void main(String[] args) throws IOException {
-        String url = "http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=bsq626";
+        String url = "http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=bsq022";
+        String url2 = "http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=bsq626";
+        String url3 = "http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=bsq937";
         //Document doc = Jsoup.connect(url).get();
         //String title = doc.title();
         //Elements li = doc.select("li");
@@ -23,7 +25,8 @@ public class BusInfoProcess {
 
         //尝试使用遍历字符串的形式对得到的信息进行匹配
         //infoExtract(busInfoFormat(busInfo));
-        getBusByUrl(url);
+        //getBusByUrl(url);
+        getBusStopName(url);
     }
 
     public static Bus[] getBusByUrl (String url){
@@ -148,6 +151,22 @@ public class BusInfoProcess {
             System.out.println("busArray[" + i + "].toString:" + busArray[i].toString());
         }
         return busArray;
+    }
+
+    public static String getBusStopName(String url) {
+        //获取网页信息
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(url).get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //提取<li>标签中的公交信息并格式化
+        Elements li = doc.select("#lbStationName");
+        String busStopName = li.text();
+        //TEST
+        System.out.println(busStopName);
+        return busStopName;
     }
 }
 

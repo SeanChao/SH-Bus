@@ -1,4 +1,4 @@
-package seanchao.xyz.shbus;
+package xyz.seanchao.shbus;
 
 import org.junit.Test;
 

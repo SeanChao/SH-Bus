@@ -1,4 +1,4 @@
-package seanchao.xyz.shbus;
+package xyz.seanchao.shbus;
 
 /**
  * Created by SeanC on 2018/2/12.
