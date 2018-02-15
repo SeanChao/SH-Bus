@@ -1,5 +1,6 @@
 package xyz.seanchao.shbus;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,6 +22,14 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private String busId = "022";
     private DrawerLayout mDrawerLayout;
     private NavigationView navView;
+    private BusStop[] stops;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,18 +70,25 @@ public class MainActivity extends AppCompatActivity {
         });
 
         navView = findViewById(R.id.nav_view);
-        navView.setCheckedItem(R.id.nav_1);
+        navView.setCheckedItem(R.id.favourite);
+
+        addMenuItem();
+
+        //menu.setGroupVisible(R.id.group_bus_stop, true);
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
                 int id = item.getItemId();
                 switch (id) {
-                    case R.id.nav_1:
+                    case R.id.favourite:
                         mDrawerLayout.closeDrawers();
                         return true;
-                    default:
-                        return true;
+                    case R.id.bus_stop_primary:
+                        id = 0;
                 }
+                busId = stops[id].getId();//err
+                refreshBuses();
+                return true;
             }
         });
 
@@ -206,4 +223,72 @@ public class MainActivity extends AppCompatActivity {
         swipeRefresh.setProgressViewOffset(false, 0, 100);
         swipeRefresh.setRefreshing(true);
     }
+
+    public void save(String inputText) {
+        FileOutputStream out = null;
+        BufferedWriter writer = null;
+        try {
+            //PRIVATE覆盖 APPEDN增加
+            out = openFileOutput("nav_items", Context.MODE_APPEND);
+            writer = new BufferedWriter(new OutputStreamWriter(out));
+            writer.write(inputText);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (writer != null) {
+                    writer.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    public String load(String fileName) {
+        FileInputStream in = null;
+        BufferedReader reader = null;
+        StringBuilder content = new StringBuilder();
+        try {
+            File file = new File("nav_items");
+            if (!file.exists()) {
+                save("[{\"name\":\"\",\"id\":\"\"}]");
+            }
+            in = openFileInput(fileName);
+            reader = new BufferedReader(new InputStreamReader(in));
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                content.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return content.toString();
+    }
+
+    public void addMenuItem() {
+        stops = JsonProcess.getJson(load("nav_items"));
+        Menu menu = navView.getMenu();
+        for (int i = 0; i < stops.length; i++) {
+            if (!stops[i].getName().equals("")) {
+                if (i == 0) {
+                    menu.findItem(R.id.bus_stop_primary).setTitle("2333");
+                } else {
+                    System.out.println("i====" + i);
+                    menu.add(R.id.group_bus_stop, i, Menu.NONE, stops[i].getName()).setIcon(R.drawable.ic_directions_bus_24dp).setCheckable(true);
+                    menu.setGroupCheckable(R.id.group_bus_stop, true, true);
+                }
+            }
+        }
+    }
+
 }

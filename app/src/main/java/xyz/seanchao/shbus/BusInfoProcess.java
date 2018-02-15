@@ -16,6 +16,7 @@ public class BusInfoProcess {
         String url = "http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=bsq022";
         String url2 = "http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=bsq626";
         String url3 = "http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=bsq937";
+        String urln1 = "http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=bsq1";
         //Document doc = Jsoup.connect(url).get();
         //String title = doc.title();
         //Elements li = doc.select("li");
@@ -26,7 +27,9 @@ public class BusInfoProcess {
         //尝试使用遍历字符串的形式对得到的信息进行匹配
         //infoExtract(busInfoFormat(busInfo));
         //getBusByUrl(url);
-        getBusStopName(url);
+        System.out.print("a");
+        System.out.print(getBusStopName(urln1));
+        System.out.print("a");
     }
 
     public static Bus[] getBusByUrl (String url){
@@ -113,9 +116,9 @@ public class BusInfoProcess {
             String arrivalTime = "" ;
 
             int spaceCounter = 0;//空格计数器
-            if ( !busInfoArray[i].equals(null)&& busInfoArray[i].length() != 0) {
+            if (!busInfoArray[i].equals("") && busInfoArray[i].length() != 0) {
                 for (int j = 0 ; j < busInfoArray[i].length() ; j++ ) {
-                    //TODO 抽取单个bus的上述信息
+                    //抽取单个bus的上述信息
                     String singleBusInfo = busInfoArray[i];
                     if (String.valueOf(singleBusInfo.charAt(j)).equals(" ")) {
                         spaceCounter ++;
