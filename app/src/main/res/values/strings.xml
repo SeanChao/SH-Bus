@@ -1,13 +1,19 @@
 <resources>
     <string name="app_name">宝山公交查询</string>
     <string name="activity_label">公交车到了吗</string>
-    <string name="action_settings">Settings</string>
 
-    <string name="edit_text_hint">请输入站点id</string>
+    <string name="action_settings">设置</string>
+    <string name="action_delete">删除</string>
+
+    <string name="edit_text_hint_id">请输入站点id(如001,084,312...)</string>
+    <string name="edit_text_hint_name">请输入精确的车站名</string>
     <string name="title_activity_bus_stop">BusStopActivity</string>
 
     <string name="action_ok">确定</string>
 
     <string name="favourite">收藏</string>
     <string name="bus_stop">车站</string>
+
+    <string name="data_duplicate">已经存过啦@_@</string>
+    <string name="data_saved">保存成功(๑´ㅂ`๑) </string>
 </resources>

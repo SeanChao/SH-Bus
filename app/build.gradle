@@ -4,10 +4,10 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "xyz.seanchao.shbus"
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 26
         versionCode 1
-        versionName "0.1.0-beta"
+        versionName "0.9.0-beta"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -31,4 +31,6 @@ dependencies {
     compile 'com.android.support:cardview-v7:26.1.0'
     compile 'com.android.support:recyclerview-v7:26.1.0'
     compile 'com.alibaba:fastjson:1.1.67.android'
+    compile 'com.yanzhenjie:recyclerview-swipe:+'
+    implementation 'com.squareup.okhttp3:okhttp:+'
 }

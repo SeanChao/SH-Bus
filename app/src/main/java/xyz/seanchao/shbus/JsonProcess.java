@@ -1,11 +1,6 @@
 package xyz.seanchao.shbus;
 
-import android.util.Log;
-
 import com.alibaba.fastjson.JSON;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.List;
 
@@ -40,7 +35,7 @@ import java.util.List;
 public class JsonProcess {
 
     //读取JSON
-    public static BusStop[] getJson(String jsonString) {
+    public static BusStop[] fromJson(String jsonString) {
         BusStop[] busStops = new BusStop[32];
         //init
         for (int i = 0; i < busStops.length; i++) {
@@ -57,7 +52,7 @@ public class JsonProcess {
     }
 
     public static String toJson(BusStop busStop, String currentData) {
-        BusStop[] busStops = getJson(currentData);
+        BusStop[] busStops = fromJson(currentData);
         //得到有效的长度
         int num = 0;
         for (int i = 0; i < busStops.length; i++) {
@@ -70,5 +65,83 @@ public class JsonProcess {
         String jsonString = JSON.toJSONString(busStops);
         System.out.println("得到的JsonString" + jsonString);
         return jsonString;
+    }
+
+    //传入一个对象并转换为Json数据
+    public static String toJson(BusStop busStop) {
+        String jsonString = JSON.toJSONString(busStop);
+        System.out.println("得到的JsonString" + jsonString);
+        return jsonString;
+    }
+
+    public static String toJson(BusStop[] busStops) {
+        String jsonString = JSON.toJSONString(busStops);
+        System.out.println("得到的JsonString" + jsonString);
+        return jsonString;
+    }
+
+
+    //single:
+    //读取JSON
+    public static SingleBusStop[] fromJsonSingle(String jsonString) {
+        SingleBusStop[] singleBusStops = new SingleBusStop[32];
+        //init
+        for (int i = 0; i < singleBusStops.length; i++) {
+            singleBusStops[i] = new SingleBusStop("", "", "");
+        }
+        List<SingleBusStop> busStopList = JSON.parseArray(jsonString, SingleBusStop.class);
+        for (int i = 0; i < busStopList.size(); i++) {
+            singleBusStops[i] = busStopList.get(i);
+            if (singleBusStops[i].equals(null)) {
+                singleBusStops[i] = new SingleBusStop("", "", "");
+            }
+        }
+        return singleBusStops;
+    }
+
+
+    public static String toJsonSingle(SingleBusStop singleBusStop, String currentData) {
+        SingleBusStop[] singleBusStops = fromJsonSingle(currentData);
+        //得到有效的长度
+        int num = 0;
+        for (int i = 0; i < singleBusStops.length; i++) {
+            System.out.println(singleBusStops[i].getName());
+            if (!singleBusStops[i].getName().equals("")) {
+                num++;
+            }
+        }
+        singleBusStops[num] = singleBusStop;
+        String jsonString = JSON.toJSONString(singleBusStops);
+        System.out.println("得到的JsonString" + jsonString);
+        return jsonString;
+    }
+
+    public static String toJsonSingle(SingleBusStop[] singleBusStop) {
+        String jsonString = JSON.toJSONString(singleBusStop);
+        System.out.println("得到的JsonString" + jsonString);
+        return jsonString;
+    }
+
+    //传入一个对象并转换为Json数据
+    public static String toJson(SingleBus singleBusStop) {
+        String jsonString = JSON.toJSONString(singleBusStop);
+        System.out.println("得到的JsonString" + jsonString);
+        return jsonString;
+    }
+
+    public static BusStop[] fromJsoninName(String jsonString) {
+        BusStop[] busStops = new BusStop[2000];
+        //init
+        for (int i = 0; i < busStops.length; i++) {
+            busStops[i] = new BusStop("", "", "");
+        }
+        List<BusStop> busStopList = JSON.parseArray(jsonString, BusStop.class);
+        for (int i = 0; i < busStopList.size(); i++) {
+            busStops[i] = busStopList.get(i);
+            if (busStops[i].equals(null)) {
+                busStops[i] = new BusStop("", "", "");
+            }
+        }
+        return busStops;
     }
 }

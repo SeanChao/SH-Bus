@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/card_view"
+    android:id="@+id/single_card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
@@ -18,22 +17,36 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_weight="15"
+            android:layout_weight="9"
             android:layout_margin="15dp">
 
             <TextView
-                android:id="@+id/bus_line_name"
+                android:id="@+id/single_bus_line_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/cv_line_name_size"
                 android:textColor="#000000"
-                android:text="Line"/>
+                android:text="Line" />
 
             <LinearLayout
+                android:translationX="-8dp"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
+                android:layout_marginTop="5dp"
                 android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="15dp"
+                    android:src="@drawable/ic_location_on_24dp" />
+
+                <TextView
+                    android:id="@+id/single_bus_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Stop"
+                    android:textSize="@dimen/cv_small_size" />
 
                 <ImageView
                     android:layout_width="match_parent"
@@ -41,13 +54,12 @@
                     android:src="@drawable/ic_near_me_24dp" />
 
                 <TextView
-                    android:id="@+id/bus_destination_name"
+                    android:id="@+id/single_bus_destination_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/cv_small_size"
                     android:text="Destination" />
             </LinearLayout>
-
         </LinearLayout>
 
         <LinearLayout
@@ -58,7 +70,7 @@
             android:gravity="right|center">
 
             <TextView
-                android:id="@+id/bus_arrival_time"
+                android:id="@+id/single_bus_arrival_time"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center"

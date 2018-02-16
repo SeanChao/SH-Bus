@@ -4,6 +4,8 @@ package xyz.seanchao.shbus;
  * Created by SeanC on 2018/2/13.
  */
 
+import android.util.Log;
+
 import java.io.IOException;
 
 import org.jsoup.*;
@@ -11,6 +13,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 public class BusInfoProcess {
+    static int postCounter = 0;
+
+    public static void updateNetworkStat() {
+        postCounter++;
+        String log = "已发送" + postCounter + "次网络请求";
+        Log.d("STAT", log);
+    }
 
     public static void main(String[] args) throws IOException {
         String url = "http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=bsq022";
@@ -37,6 +46,7 @@ public class BusInfoProcess {
         Document doc = null;
         try {
             doc = Jsoup.connect(url).get();
+            updateNetworkStat();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -61,6 +71,7 @@ public class BusInfoProcess {
                 url = urlbase + i ;
             }
             Document doc = Jsoup.connect(url).get();
+            updateNetworkStat();
             //String title = doc.title();
             Elements li = doc.select("li");
             String busInfo = li.text();
@@ -95,12 +106,10 @@ public class BusInfoProcess {
             }
 
         }
-
         //Debug
         for (int i = 0; i < busInfoArray.length; i++) {
             System.out.println("busInfoArray" + "[" + (i) + "]=" + busInfoArray[i]);
         }
-
         return busInfoArray;
     }
 
@@ -116,6 +125,7 @@ public class BusInfoProcess {
             String arrivalTime = "" ;
 
             int spaceCounter = 0;//空格计数器
+            int relative = 0;
             if (!busInfoArray[i].equals("") && busInfoArray[i].length() != 0) {
                 for (int j = 0 ; j < busInfoArray[i].length() ; j++ ) {
                     //抽取单个bus的上述信息
@@ -126,7 +136,10 @@ public class BusInfoProcess {
                     if(spaceCounter == 0 ) {
                         name += String.valueOf(singleBusInfo.charAt(j));
                     }else if (spaceCounter == 1 ) {
-                        destination += String.valueOf(singleBusInfo.charAt(j)).trim();
+                        relative++;
+                        if (relative > 3) {
+                            destination += String.valueOf(singleBusInfo.charAt(j)).trim();
+                        }
                     }else if (spaceCounter == 2 ) {
                         timeTable += String.valueOf(singleBusInfo.charAt(j)).trim();
                     }else if (spaceCounter == 3 ) {
@@ -134,9 +147,10 @@ public class BusInfoProcess {
                         if (arrivalTime.equals("暂无来车，请稍候查询！")){
                             isRunning = false;
                         }else {
-                            String pattern = "[^\\d+\\:\\d+]";
+                            String pattern = "[^\\d+:\\d+]";
                             arrivalTime = arrivalTime.replaceAll(pattern, "");
                             if (arrivalTime.equals("")) {
+                                System.out.println("到达时间为:" + arrivalTime + arrivalTime.equals(""));
                                 arrivalTime = "zZ-zZ";
                             }
                         }
@@ -161,6 +175,7 @@ public class BusInfoProcess {
         Document doc = null;
         try {
             doc = Jsoup.connect(url).get();
+            updateNetworkStat();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -170,6 +185,59 @@ public class BusInfoProcess {
         //TEST
         System.out.println(busStopName);
         return busStopName;
+    }
+
+    public static SingleBus getSingleBusByUrl(String url, String busName) {
+        Bus[] buses = getBusByUrl(url);
+        for (int i = 0; i < buses.length; i++) {
+            Bus bus = buses[i];
+            if (bus.getName().equals(busName)) {
+                return new SingleBus(getBusStopName(url), bus.getName(), bus.getDestination(), bus.getTimeTable(), bus.getArrivalTime());
+            }
+        }
+        return new SingleBus("", "", "", "", "");
+    }
+
+    public static String getAllBusInfo() throws IOException {
+        String jsonData = "[";
+        int counter = 0;
+        String urlbase = "http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=bsq";
+        String url = "";
+        for (int i = 0; i < 2000; i++) {
+            String id = "";
+            if (i < 10) {
+                id = "00" + i;
+            } else if (i < 100) {
+                id = "0" + i;
+            } else {
+                id = "" + i;
+            }
+            url = urlbase + id;
+            Document doc = Jsoup.connect(url).get();
+            //String title = doc.title();
+            Elements stopName = doc.select("#lbStationName");
+            String busStopName = stopName.text();
+            Elements stopAddress = doc.select("#lbStationAdress");
+            String busStopAddress = stopAddress.text();
+            if (busStopName.equals("")) {
+                continue;
+            }
+            System.out.println(busStopName + " " + busStopAddress);
+            jsonData += "{\"id\":\"" + id + "\",\"name\":\"" + busStopName + "\",\"address\":\"" + busStopAddress + "\"},";
+            if (i > 10) {
+                break;
+            }
+        }
+        String jsonData2 = "";
+        for (int i = 0; i < jsonData.length(); i++) {
+            if (i == jsonData.length() - 1) {
+                jsonData2 += "]";
+                break;
+            }
+            jsonData2 += jsonData.charAt(i);
+        }
+
+        return jsonData2;
     }
 }
 

@@ -13,18 +13,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-//import com.bumptech.glide.Glide;
 import java.util.List;
 
-public class BusAdapter extends RecyclerView.Adapter<BusAdapter.ViewHolder>{
+//import com.bumptech.glide.Glide;
 
-    private static final String TAG = "BusAdapter";
+public class SingleBusAdapter extends RecyclerView.Adapter<SingleBusAdapter.ViewHolder> {
+
+    private static final String TAG = "SingleBusAdapter";
 
     private Context mContext;
 
-    private List<Bus> mBusList;
+    private List<SingleBus> mBusList;
 
-    /**定义一个内部类ViewHolder，继承自...，然后其构造参数中传入一个View参数，通常是RecyclerView子项的最外层布局
+    /**
+     * 定义一个内部类ViewHolder，继承自...，然后其构造参数中传入一个View参数，通常是RecyclerView子项的最外层布局
      * 然后就可以通过findViewById()的方法获取到布局中的ImageView&TextView的实例了
      */
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -33,33 +35,35 @@ public class BusAdapter extends RecyclerView.Adapter<BusAdapter.ViewHolder>{
         TextView busName;
         TextView busDestinationName;
         TextView busArrivalTime;
+        TextView stopName;
 
         public ViewHolder(View view) {
             super(view);
             cardView = (CardView) view;
-            busName = (TextView) view.findViewById(R.id.bus_line_name);
-            busDestinationName = (TextView) view.findViewById(R.id.bus_destination_name);
-            busArrivalTime = (TextView) view.findViewById(R.id.bus_arrival_time);
+            busName = (TextView) view.findViewById(R.id.single_bus_line_name);
+            busDestinationName = (TextView) view.findViewById(R.id.single_bus_destination_name);
+            busArrivalTime = view.findViewById(R.id.single_bus_arrival_time);
+            stopName = view.findViewById(R.id.single_bus_name);
         }
     }
 
     //用于传入要展示的数据源，并赋值给全局变量mBusList，后续的操作在这个数据源的基础上进行
-    public BusAdapter(List<Bus> busList) {
+    public SingleBusAdapter(List<SingleBus> busList) {
         mBusList = busList;
     }
 
     //重写以下3个方法
 
     /**
-    *创建ViewHolder实例。加载bus_item布局，随后创建一个ViewHolder实例，并把加载出来的布局传入到构造函数当中
-    *最后将ViewHolder实例返回
-    */
+     * 创建ViewHolder实例。加载bus_item布局，随后创建一个ViewHolder实例，并把加载出来的布局传入到构造函数当中
+     * 最后将ViewHolder实例返回
+     */
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (mContext == null) {
             mContext = parent.getContext();
         }
-        View view = LayoutInflater.from(mContext).inflate(R.layout.bus_item, parent, false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.single_bus_item, parent, false);
         final ViewHolder holder = new ViewHolder(view);
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,10 +92,11 @@ public class BusAdapter extends RecyclerView.Adapter<BusAdapter.ViewHolder>{
     //然后将数据设置到ViewHolder的ImageView和TextView中
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Bus bus = mBusList.get(position);
+        SingleBus bus = mBusList.get(position);
         holder.busName.setText(bus.getName());
         holder.busDestinationName.setText(bus.getDestination());
         holder.busArrivalTime.setText(bus.getArrivalTime());
+        holder.stopName.setText(bus.stop);
         //Glide.with(mContext).load(bus.getImageId()).into(holder.busImage);
     }
 

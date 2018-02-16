@@ -10,9 +10,9 @@
     },
     "path": "app-release.apk",
     "properties": {
-      "packageId": "seanchao.xyz.shbus",
+      "packageId": "xyz.seanchao.shbus",
       "split": "",
-      "minSdkVersion": "14"
+      "minSdkVersion": "16"
     }
   }
 ]

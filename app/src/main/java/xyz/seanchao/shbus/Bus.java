@@ -38,7 +38,6 @@ public class Bus {
         this.name = name;
         this.destination = destination;
         this.timeTable = timeTable;
-
         this.arrivalTime = arrivalTime;
     }
 

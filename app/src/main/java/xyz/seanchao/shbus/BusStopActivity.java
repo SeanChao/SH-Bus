@@ -1,7 +1,9 @@
 package xyz.seanchao.shbus;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -12,7 +14,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import com.alibaba.fastjson.JSON;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -20,10 +25,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class BusStopActivity extends AppCompatActivity {
 
@@ -34,14 +44,26 @@ public class BusStopActivity extends AppCompatActivity {
     private String busStopName = "";
     private Toolbar toolbar;
     private SwipeRefreshLayout swipeRefresh;
+    private int flag;
+    private String stopName;
+    private BusStop[] busStops = new BusStop[2000];
 
-    String file = "nav_items";
+    String file = "nav_items.json";
     private BusStop newBusStop = new BusStop("", "");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ProgressDialog progressDialog = new ProgressDialog(BusStopActivity.this);
+        progressDialog.setMessage("正在努力加载");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
         Intent intent = getIntent();
-        busId = intent.getStringExtra("busId");
+        flag = intent.getIntExtra("flag", 0);
+
+
         setContentView(R.layout.activity_bus_stop);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -63,12 +85,50 @@ public class BusStopActivity extends AppCompatActivity {
             }
         });
 
-        //从BusInfoProcess中获取信息
-        getOnlineBusInfo(busId);
+        if (flag == 1) {
+            busId = intent.getStringExtra("bus_id");
+            //从BusInfoProcess中获取信息
+            getOnlineBusInfo(busId);
+        } else if (flag == 2) {
+            byName();
+        }
 
+
+        progressDialog.dismiss();
     }
 
+    private void byName() {
 
+        new Thread(new Runnable() {
+            String responseData = "";
+
+            @Override
+            public void run() {
+                try {
+                    OkHttpClient client = new OkHttpClient();
+                    Request request = new Request.Builder()
+                            .url("http://app.seanchao.xyz/app/all_bus.json").build();
+                    Response response = client.newCall(request).execute();
+                    responseData = response.body().string();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                busStops = JsonProcess.fromJsoninName(responseData);
+                BusStop[] matchedBusStops = new BusStop[16];
+                for (int i = 0; i < busStops.length; i++) {
+                    if (busStops[i].getName().equals("")) {
+                        matchedBusStops[i] = busStops[i];
+                    } else {
+                        matchedBusStops[i] = new BusStop("", "", "");
+                    }
+                }
+
+                
+            }
+        }).start();
+
+    }
     private void getOnlineBusInfo(final String busId) {
         new Thread(new Runnable() {
             @Override
@@ -161,8 +221,17 @@ public class BusStopActivity extends AppCompatActivity {
             case R.id.action_done:
                 String cuttentData = load(file);
                 String newData = JsonProcess.toJson(newBusStop, cuttentData);
+                //读取现有数据获得BusStop[]
+                BusStop[] stops = JsonProcess.fromJson(cuttentData);
+                for (int i = 0; i < stops.length; i++) {
+                    if (stops[i].getId().equals(newBusStop.getId())) {
+                        Snackbar.make(this.findViewById(R.id.action_done), R.string.data_duplicate, Snackbar.LENGTH_SHORT).show();
+                        return super.onOptionsItemSelected(item);
+                    }
+                }
                 savePri(newData);
-                Snackbar.make(this.findViewById(R.id.action_done), "保存成功", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(this.findViewById(R.id.action_done), R.string.data_saved, Snackbar.LENGTH_SHORT).show();
+                //onBackPressed();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -172,11 +241,8 @@ public class BusStopActivity extends AppCompatActivity {
         FileOutputStream out = null;
         BufferedWriter writer = null;
         try {
-            if (!new File("nav_items").exists()) {
-                save("[{\"name\":\"\",\"id\":\"\"}]");
-            }
             //PRIVATE覆盖 APPEDN增加
-            out = openFileOutput("nav_items", Context.MODE_PRIVATE);
+            out = openFileOutput(file, Context.MODE_PRIVATE);
             writer = new BufferedWriter(new OutputStreamWriter(out));
             writer.write(inputText);
         } catch (IOException e) {
@@ -197,7 +263,7 @@ public class BusStopActivity extends AppCompatActivity {
         BufferedWriter writer = null;
         try {
             //PRIVATE覆盖 APPEDN增加
-            out = openFileOutput("nav_items", Context.MODE_APPEND);
+            out = openFileOutput(file, Context.MODE_APPEND);
             writer = new BufferedWriter(new OutputStreamWriter(out));
             writer.write(inputText);
         } catch (IOException e) {
@@ -218,10 +284,6 @@ public class BusStopActivity extends AppCompatActivity {
         BufferedReader reader = null;
         StringBuilder content = new StringBuilder();
         try {
-            File file = new File("nav_items");
-            if (!file.exists()) {
-                save("[{\"name\":\"\",\"id\":\"\"}]");
-            }
             in = openFileInput(fileName);
             reader = new BufferedReader(new InputStreamReader(in));
             String line = "";

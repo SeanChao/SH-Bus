@@ -8,6 +8,15 @@ public class BusStop {
 
     String name;
     String id;
+    String address;
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
     BusStop() {
 
@@ -16,6 +25,12 @@ public class BusStop {
     BusStop(String name, String id) {
         this.setName(name);
         this.setId(id);
+    }
+
+    BusStop(String id, String name, String address) {
+        this.setId(id);
+        this.setName(name);
+        this.setAddress(address);
     }
 
     public String getName() {
