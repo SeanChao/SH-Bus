@@ -165,13 +165,15 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String inputText = editText.getText().toString();
-                        Intent intent = new Intent(MainActivity.this, BusStopActivity.class);
+                        Intent intent = null ;
                         if (cb_id_checked) {
+                            intent = new Intent(MainActivity.this, BusStopActivity.class);
                             intent.putExtra("busId", inputText);
-                            intent.putExtra("flag", 1);
+                           // intent.putExtra("flag", 1);
                         } else if (cb_name_chceked) {
+                            intent = new Intent(MainActivity.this, ChooseStopActivity.class);
                             intent.putExtra("busName", inputText);
-                            intent.putExtra("flag", 2);
+                            //intent.putExtra("flag", 2);
                         }
                         startActivity(intent);
                         //refreshBuses();

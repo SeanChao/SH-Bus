@@ -16,4 +16,5 @@
 
     <string name="data_duplicate">已经存过啦@_@</string>
     <string name="data_saved">保存成功(๑´ㅂ`๑) </string>
+    <string name="title_activity_choose_stop">ChooseStopActivity</string>
 </resources>

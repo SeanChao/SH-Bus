@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,8 +46,6 @@ public class BusStopActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private SwipeRefreshLayout swipeRefresh;
     private int flag;
-    private String stopName;
-    private BusStop[] busStops = new BusStop[2000];
 
     String file = "nav_items.json";
     private BusStop newBusStop = new BusStop("", "");
@@ -62,7 +61,7 @@ public class BusStopActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         flag = intent.getIntExtra("flag", 0);
-
+        Log.d("Debug","flag:"+flag);
 
         setContentView(R.layout.activity_bus_stop);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -85,50 +84,14 @@ public class BusStopActivity extends AppCompatActivity {
             }
         });
 
-        if (flag == 1) {
-            busId = intent.getStringExtra("bus_id");
+            busId = intent.getStringExtra("busId");
+            Log.d("Debug","busID;:"+busId);
             //从BusInfoProcess中获取信息
             getOnlineBusInfo(busId);
-        } else if (flag == 2) {
-            byName();
-        }
-
 
         progressDialog.dismiss();
     }
 
-    private void byName() {
-
-        new Thread(new Runnable() {
-            String responseData = "";
-
-            @Override
-            public void run() {
-                try {
-                    OkHttpClient client = new OkHttpClient();
-                    Request request = new Request.Builder()
-                            .url("http://app.seanchao.xyz/app/all_bus.json").build();
-                    Response response = client.newCall(request).execute();
-                    responseData = response.body().string();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                busStops = JsonProcess.fromJsoninName(responseData);
-                BusStop[] matchedBusStops = new BusStop[16];
-                for (int i = 0; i < busStops.length; i++) {
-                    if (busStops[i].getName().equals("")) {
-                        matchedBusStops[i] = busStops[i];
-                    } else {
-                        matchedBusStops[i] = new BusStop("", "", "");
-                    }
-                }
-
-                
-            }
-        }).start();
-
-    }
     private void getOnlineBusInfo(final String busId) {
         new Thread(new Runnable() {
             @Override
