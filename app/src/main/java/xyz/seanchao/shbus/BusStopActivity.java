@@ -46,6 +46,7 @@ public class BusStopActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private SwipeRefreshLayout swipeRefresh;
     private int flag;
+    private ProgressDialog progressDialog;
 
     String file = "nav_items.json";
     private BusStop newBusStop = new BusStop("", "");
@@ -54,7 +55,7 @@ public class BusStopActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ProgressDialog progressDialog = new ProgressDialog(BusStopActivity.this);
+        progressDialog = new ProgressDialog(BusStopActivity.this);
         progressDialog.setMessage("正在努力加载");
         progressDialog.setCancelable(false);
         progressDialog.show();
@@ -84,18 +85,17 @@ public class BusStopActivity extends AppCompatActivity {
             }
         });
 
-            busId = intent.getStringExtra("busId");
-            Log.d("Debug","busID;:"+busId);
-            //从BusInfoProcess中获取信息
-            getOnlineBusInfo(busId);
-
-        progressDialog.dismiss();
+        busId = intent.getStringExtra("busId");
+        Log.d("Debug", "busID;:" + busId);
+        //从BusInfoProcess中获取信息
+        getOnlineBusInfo(busId);
     }
 
     private void getOnlineBusInfo(final String busId) {
         new Thread(new Runnable() {
             @Override
             public void run() {
+
                 String urlBase = "http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=bsq";
                 String url = urlBase + busId;
                 buses = BusInfoProcess.getBusByUrl(url);
@@ -103,6 +103,7 @@ public class BusStopActivity extends AppCompatActivity {
                 //生成newBusStop
                 newBusStop = new BusStop(busStopName, busId);
                 showResponse();
+                progressDialog.dismiss();
             }
         }).start();
     }

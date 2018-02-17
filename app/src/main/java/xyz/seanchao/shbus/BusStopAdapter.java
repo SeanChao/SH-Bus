@@ -5,6 +5,7 @@ package xyz.seanchao.shbus;
  */
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -54,7 +55,7 @@ public class BusStopAdapter extends RecyclerView.Adapter<BusStopAdapter.ViewHold
     *最后将ViewHolder实例返回
     */
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
         if (mContext == null) {
             mContext = parent.getContext();
         }
@@ -63,8 +64,12 @@ public class BusStopAdapter extends RecyclerView.Adapter<BusStopAdapter.ViewHold
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Context mContext = parent.getContext();
                 Snackbar.make(v, "开发中", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                Intent intent = new Intent(mContext, BusStopActivity.class);
+                intent.putExtra("busId", mBusList.get(holder.getAdapterPosition()).getId());
+                mContext.startActivity(intent);
             }
         });
         holder.cardView.setLongClickable(true);

@@ -6,7 +6,10 @@ package xyz.seanchao.shbus;
 
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
+
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
@@ -239,5 +242,92 @@ public class BusInfoProcess {
 
         return jsonData2;
     }
+
+    public static void listAllBustoGetBusArray() throws IOException {
+        BusWithStopArray[] buses = new BusWithStopArray[4096];
+        for (int f = 0; f < buses.length; f++) {
+            buses[f] = new BusWithStopArray("");
+        }
+        int counter = 0;
+        String urlbase = "http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=bsq";
+        String url = "";
+        String id = "";
+        String stop = "";
+        for (int i = 0; i < 1600; i++) {
+            if (i < 10) {
+                id = "00" + i;
+            } else if (i < 100) {
+                id = "0" + i;
+            } else {
+                id = "" + i;
+            }
+            System.out.println("Generate id:" + id);
+            url = urlbase + id;
+            Document doc = Jsoup.connect(url).get();
+            Elements busInfoElement = doc.select("li");
+            stop = doc.select("#lbStationName").text();
+            System.out.println(stop);
+            String busInfo = busInfoElement.text();
+            if (busInfo.equals("")) {
+                continue;
+            }
+            Bus[] originBuses = infoExtract(busInfoFormat(busInfo));
+            System.out.println("生成原始Bus数组 长度：" + originBuses.length);
+            for (int ii = 0; ii < originBuses.length; ii++) {
+                Bus buss = originBuses[ii];
+                if (buss.name.equals("") || buss.name == null) {
+                    continue;
+                }
+                System.out.println("生成原始Bus[" + ii + "] name:" + buss.name);
+                BusWithStopArray bus; //= new BusWithStopArray(buss.name);
+                bus = BusWithStopArray.findBusByName(buss.name, buses);
+                System.out.println("有相同对象" + !(bus == null));
+                if (bus == null) {
+                    buses[counter] = new BusWithStopArray(buss.name);
+                    buses[counter].add(stop, id);
+                    System.out.println("不存在同名对象 add方法: buses[" + counter + "] name:" + buses[counter].getBus() + " stop:" + stop + " id:" + id);
+                } else {
+                    bus.add(stop, id);
+                    System.out.println("存在 add方法: buses[" + counter + "] name:" + buses[counter].getBus() + " stop:" + stop + " id:" + id);
+                }
+                counter++;
+                System.out.println("检测存在与否循环每次结束counter:" + counter);
+            }
+        }
+
+        //此时输出的JSON中含有大量null，进一步处理：
+        ArrayList<OptimizedBus> busList = new ArrayList<OptimizedBus>();
+        for (int i = 0; i < buses.length; i++) {//length:4096
+            BusWithStopArray bus = buses[i];
+            if (bus.getBus().equals("")) {
+                continue;
+            }
+            for (int j = 0; j < 64; j++) {
+                //取得有效的长度 去除Null和""
+                if (bus.getId()[j] != null && bus.getId()[j] != "") {
+                    bus.usefulMaxIndex = j;
+                }
+            }
+            int length = bus.usefulMaxIndex + 1;
+            System.out.println("length:" + length);
+            OptimizedBus oBus = new OptimizedBus();
+            oBus.stop = new String[length];
+            oBus.id = new String[length];
+            for (int j = 0; j < length; j++) {
+                oBus.stop[j] = bus.stop[j];
+                oBus.id[j] = bus.id[j];
+                oBus.bus = bus.bus;
+            }
+            busList.add(oBus);
+        }
+        int length = busList.size();
+        OptimizedBus[] oBuses = new OptimizedBus[length];
+        for (int i = 0; i < length; i++) {
+            oBuses[i] = busList.get(i);
+        }
+        String jsonString = JSON.toJSONString(oBuses);
+        System.out.println(jsonString);
+    }
+
 }
 

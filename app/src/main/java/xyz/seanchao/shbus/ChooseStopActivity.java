@@ -1,6 +1,7 @@
 package xyz.seanchao.shbus;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -23,16 +24,19 @@ public class ChooseStopActivity extends AppCompatActivity {
 
     private String stopName;
     BusStop[] busStops = new BusStop[2000];
+    BusStop[] matchedBusStops = new BusStop[16];
     ProgressDialog progressDialog;
     List<BusStop> busStopsList = new ArrayList<>();
 	private BusStopAdapter adapter;
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_stop);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.cb_toolbar);
+        toolbar = (Toolbar) findViewById(R.id.cb_toolbar);
         setSupportActionBar(toolbar);
+
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -41,7 +45,9 @@ public class ChooseStopActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+
         stopName = getIntent().getStringExtra("busName");
+        Log.d("Debug", toolbar.getTitle().toString());
         Log.d("Debug","stopName:"+stopName);
         progressDialog = new ProgressDialog(ChooseStopActivity.this);
         progressDialog.setMessage("正在努力加载");
@@ -51,13 +57,17 @@ public class ChooseStopActivity extends AppCompatActivity {
 
     }
 
-    private void byName() {
+    public void onClick() {
+        Intent intent = new Intent(ChooseStopActivity.this, ChooseStopActivity.class);
+    }
 
+    private void byName() {
         new Thread(new Runnable() {
             String responseData = "";
             @Override
             public void run() {
                 try {
+                    toolbar.setTitle(stopName);
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder()
                             .url("http://app.seanchao.xyz/app/all_stop.json").build();
@@ -67,7 +77,7 @@ public class ChooseStopActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 busStops = JsonProcess.fromJsoninName(responseData);
-                BusStop[] matchedBusStops = new BusStop[16];
+                matchedBusStops = new BusStop[16];
                 int index = 0;
                 for (int i = 0; i < busStops.length; i++) {
                     if (busStops[i].getName().equals(stopName)) {
@@ -77,10 +87,11 @@ public class ChooseStopActivity extends AppCompatActivity {
                     }
                 }
                 for(int i = 0 ; i < matchedBusStops.length ; i++){
-                    if( i > index ){
+                    if (i > index - 1) {
                         matchedBusStops[i] = new BusStop("", "", "");
                     }
                 }
+                showResponse();
                 progressDialog.dismiss();
             }
         }).start();
@@ -92,15 +103,15 @@ public class ChooseStopActivity extends AppCompatActivity {
             @Override
             public void run() {
                 // 在这里进行UI操作，将结果显示到界面上
-                toolbar.setTitle(busStopName);
+                toolbar.setTitle(stopName);
                 initBuses();
-                RecyclerView recyclerView = findViewById(R.id.bus_stop_recycler_view);
+                RecyclerView recyclerView = findViewById(R.id.cb_recycler_view);
                 GridLayoutManager layoutManager = new GridLayoutManager(ChooseStopActivity.this, 1);
                 recyclerView.setLayoutManager(layoutManager);
-                adapter = new BusAdapter(busStopsList);
+                adapter = new BusStopAdapter(busStopsList);
                 recyclerView.setAdapter(adapter);
                 if (stopName.equals("")) {
-                    Toast.makeText(BusStopActivity.this, "未获取到信息", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ChooseStopActivity.this, "未获取到信息", Toast.LENGTH_SHORT).show();
                     onBackPressed();
                 }
             }
@@ -109,13 +120,13 @@ public class ChooseStopActivity extends AppCompatActivity {
 	
 	private void initBuses() {
         busStopsList.clear();
-        for (int i = 0; i < 32; i++) {
-            if (busStops[i].getName().equals("")) {
-                boolean b = (busStops[i] == null);
+        for (int i = 0; i < matchedBusStops.length; i++) {
+            if (matchedBusStops[i].getName().equals("")) {
+                boolean b = (matchedBusStops[i] == null);
                 System.out.println("TEST:" + b);
                 break;
             }
-            busStopsList.add(busStops[i]);
+            busStopsList.add(matchedBusStops[i]);
         }
     }
 

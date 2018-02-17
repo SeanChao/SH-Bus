@@ -68,14 +68,14 @@ public class SingleBusAdapter extends RecyclerView.Adapter<SingleBusAdapter.View
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*int position = holder.getAdapterPosition();
-                Bus bus = mBusList.get(position);
-                Intent intent = new Intent(mContext, BusActivity.class);
-                intent.putExtra(BusActivity.BUS_NAME, bus.getName());
-                intent.putExtra(BusActivity.BUS_IMAGE_ID, bus.getImageId());
-                mContext.startActivity(intent);*/
-                Snackbar.make(v, "开发中", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                int position = holder.getAdapterPosition();
+                SingleBus bus = mBusList.get(position);
+                String deltaTime = Utils.getDeltaTime(bus.getArrivalTime());
+                if (bus.getArrivalTime().equals("zZ-zZ")) {
+                    deltaTime = "暂无来车";
+                }
+                Snackbar.make(v, deltaTime, Snackbar.LENGTH_LONG).show();
+                //.setAction("Action", null).show();
             }
         });
         holder.cardView.setLongClickable(true);
