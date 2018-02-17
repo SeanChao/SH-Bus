@@ -25,6 +25,7 @@ public class ChooseStopActivity extends AppCompatActivity {
     BusStop[] busStops = new BusStop[2000];
     ProgressDialog progressDialog;
     List<BusStop> busStopsList = new ArrayList<>();
+	private BusStopAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,16 +95,28 @@ public class ChooseStopActivity extends AppCompatActivity {
                 toolbar.setTitle(busStopName);
                 initBuses();
                 RecyclerView recyclerView = findViewById(R.id.bus_stop_recycler_view);
-                GridLayoutManager layoutManager = new GridLayoutManager(BusStopActivity.this, 1);
+                GridLayoutManager layoutManager = new GridLayoutManager(ChooseStopActivity.this, 1);
                 recyclerView.setLayoutManager(layoutManager);
-                adapter = new BusAdapter(busList);
+                adapter = new BusAdapter(busStopsList);
                 recyclerView.setAdapter(adapter);
-                if (busStopName.equals("")) {
+                if (stopName.equals("")) {
                     Toast.makeText(BusStopActivity.this, "未获取到信息", Toast.LENGTH_SHORT).show();
                     onBackPressed();
                 }
             }
         });
+    }
+	
+	private void initBuses() {
+        busStopsList.clear();
+        for (int i = 0; i < 32; i++) {
+            if (busStops[i].getName().equals("")) {
+                boolean b = (busStops[i] == null);
+                System.out.println("TEST:" + b);
+                break;
+            }
+            busStopsList.add(busStops[i]);
+        }
     }
 
 }
