@@ -65,8 +65,6 @@ public class BusStopAdapter extends RecyclerView.Adapter<BusStopAdapter.ViewHold
             @Override
             public void onClick(View v) {
                 Context mContext = parent.getContext();
-                Snackbar.make(v, "开发中", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
                 Intent intent = new Intent(mContext, BusStopActivity.class);
                 intent.putExtra("busId", mBusList.get(holder.getAdapterPosition()).getId());
                 mContext.startActivity(intent);

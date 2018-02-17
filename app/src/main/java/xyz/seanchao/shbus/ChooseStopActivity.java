@@ -53,12 +53,9 @@ public class ChooseStopActivity extends AppCompatActivity {
         progressDialog.setMessage("正在努力加载");
         progressDialog.setCancelable(false);
         progressDialog.show();
+        toolbar.setTitle(stopName);
         byName();
 
-    }
-
-    public void onClick() {
-        Intent intent = new Intent(ChooseStopActivity.this, ChooseStopActivity.class);
     }
 
     private void byName() {

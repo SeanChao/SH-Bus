@@ -1,8 +1,10 @@
 package xyz.seanchao.shbus;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -45,6 +47,10 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -348,8 +354,51 @@ public class MainActivity extends AppCompatActivity {
                 Snackbar.make(recyclerView, "删除成功，重新打开生效", Snackbar.LENGTH_SHORT).show();
                 addMenuItem();
                 break;
+            case R.id.action_update:
+                checkUpdate();
+                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void checkUpdate() {
+        new Thread(new Runnable() {
+            String responseData = "";
+
+            @Override
+            public void run() {
+                try {
+                    OkHttpClient client = new OkHttpClient();
+                    Request request = new Request.Builder()
+                            .url("http://app.seanchao.xyz/app/version").build();
+                    Response response = client.newCall(request).execute();
+                    responseData = response.body().string();
+                    Log.d("Debug", "server Version:" + responseData);
+                    String pattern = "[^\\d]";
+                    responseData = responseData.replaceAll(pattern, "");
+                    int version = Integer.parseInt(responseData);
+                    int currentVersion = MainActivity.this.getPackageManager().getPackageInfo(MainActivity.this.getPackageName(), 0).versionCode;
+                    Log.d("Debug", "本地Version:" + currentVersion);
+                    if (version > currentVersion) {
+                        Snackbar.make(recyclerView, "有更新！", Snackbar.LENGTH_LONG)
+                                .setAction("我要更新", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                                        intent.setData(Uri.parse("https://github.com/SeanChao/SH-Bus/releases"));
+                                        startActivity(intent);
+                                    }
+                                })
+                                .show();
+                    } else {
+                        Snackbar.make(recyclerView, "暂无更新……", Snackbar.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
     }
 
     private void showRefresh() {

@@ -4,6 +4,7 @@
 
     <string name="action_settings">设置</string>
     <string name="action_delete">删除</string>
+    <string name="action_update">检查更新</string>
 
     <string name="edit_text_hint_id">请输入站点id(如001,084,312...)</string>
     <string name="edit_text_hint_name">请输入精确的车站名</string>
@@ -16,5 +17,5 @@
 
     <string name="data_duplicate">已经存过啦@_@</string>
     <string name="data_saved">保存成功(๑´ㅂ`๑) </string>
-    <string name="title_activity_choose_stop">ChooseStopActivity</string>
+    <string name="title_activity_choose_stop"> </string>
 </resources>
