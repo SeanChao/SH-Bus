@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="districts">
+        <item>黄浦</item>
+        <item>徐汇</item>
+        <item>静安</item>
+        <item>原闸北</item>
+        <item>浦东新区</item>
+		<item>闵行</item>
+        <item>宝山</item>
+		<item>松江</item>
+        <item>嘉定</item>
+		<item>杨浦</item>
+        <item>普陀</item>
+		<item>奉贤</item>
+        <item>青浦</item>
+		<item>长宁</item>
+        <item>崇明</item>
+		<item>虹口</item>
+        <item>金山</item>
+    </string-array>
+</resources>
