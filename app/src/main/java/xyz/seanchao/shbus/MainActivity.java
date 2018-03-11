@@ -1,10 +1,16 @@
 package xyz.seanchao.shbus;
 
+import android.annotation.TargetApi;
 import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -77,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
     private AppCompatCheckBox cb_name;
     private boolean cb_id_checked = true;
     private boolean cb_name_chceked = false;
+    public static boolean isConnectToNetwork = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
         }
 
+        checkInternet();
 
         initFab();
 
@@ -100,6 +108,12 @@ public class MainActivity extends AppCompatActivity {
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                checkInternet();
+                if (!isConnectToNetwork) {
+                    toastNoNetwork();
+                    hideRefresh();
+                    return;
+                }
                 refreshBuses();
             }
         });
@@ -171,18 +185,17 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String inputText = editText.getText().toString();
-                        Intent intent = null ;
+                        Intent intent = null;
                         if (cb_id_checked) {
                             intent = new Intent(MainActivity.this, BusStopActivity.class);
                             intent.putExtra("busId", inputText);
-                           // intent.putExtra("flag", 1);
+                            // intent.putExtra("flag", 1);
                         } else if (cb_name_chceked) {
                             intent = new Intent(MainActivity.this, ChooseStopActivity.class);
                             intent.putExtra("busName", inputText);
                             //intent.putExtra("flag", 2);
                         }
                         startActivity(intent);
-                        //refreshBuses();
                     }
                 });
                 dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -251,6 +264,11 @@ public class MainActivity extends AppCompatActivity {
     //default:通过busId->爬虫处理成bus[]->busList->adapter->呈现结果
     //default:通过busId->爬虫处理成bus[]->busList->adapter
     private void getOnlineBusInfo(final String busId) {
+        checkInternet();
+        if (!isConnectToNetwork) {
+            toastNoNetwork();
+            return;
+        }
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -335,14 +353,16 @@ public class MainActivity extends AppCompatActivity {
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 break;
             case R.id.action_settings:
-                Snackbar.make(recyclerView, "得扎APP目前么撒好设置额", Snackbar.LENGTH_SHORT)
-                        .setAction("不服", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Toast.makeText(MainActivity.this, "耐心等等啦~", Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                        .show();
+//                Snackbar.make(recyclerView, "得扎APP目前么撒好设置额", Snackbar.LENGTH_SHORT)
+//                        .setAction("不服", new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View view) {
+//                                Toast.makeText(MainActivity.this, "耐心等等啦~", Toast.LENGTH_SHORT).show();
+//                            }
+//                        })
+//                        .show();
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
                 break;
             case R.id.action_delete:
                 if (flag == 0) {
@@ -458,6 +478,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addMenuItem() {
+        Log.d("debug", "addMenuItem()执行");
         stops = JsonProcess.fromJson(load(file));
         Menu menu = navView.getMenu();
         for (int i = 0; i < stops.length; i++) {
@@ -465,7 +486,9 @@ public class MainActivity extends AppCompatActivity {
                 if (i == 0) {
                     menu.findItem(R.id.bus_stop_primary).setTitle(stops[i].getName());
                 } else {
-                    System.out.println("i====" + i);
+                    if (menu.findItem(i) != null) {
+                        menu.removeItem(i);
+                    }
                     menu.add(Menu.NONE, i, Menu.NONE, stops[i].getName()).setIcon(R.drawable.ic_directions_bus_24dp).setCheckable(true);
                     menu.setGroupCheckable(R.id.group_bus_stop, true, true);
                 }
@@ -475,8 +498,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onRestart() {
+        Log.d("debug", "onRestart()执行");
         super.onRestart();
-        Menu menu = navView.getMenu();
         addMenuItem();
         refreshBuses();
     }
@@ -588,6 +611,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void initFavFile() {
+        checkInternet();
+        if (!isConnectToNetwork) {
+            toastNoNetwork();
+            return;
+        }
         showRefresh();
         flag = 0;
         singleBusStops = JsonProcess.fromJsonSingle(load(favourite_file));//要加载的有哪些车，不包含所需要呈现的信息
@@ -639,4 +667,81 @@ public class MainActivity extends AppCompatActivity {
         save(JsonProcess.toJson(stops), file);
     }
 
+    //检测当前的网络状态
+
+    //API版本23以下时调用此方法进行检测
+    //因为API23后getNetworkInfo(int networkType)方法被弃用
+    public void checkState_21() {
+        //步骤1：通过Context.getSystemService(Context.CONNECTIVITY_SERVICE)获得ConnectivityManager对象
+        ConnectivityManager connMgr = (ConnectivityManager) MainActivity.this.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        //步骤2：获取ConnectivityManager对象对应的NetworkInfo对象
+        //NetworkInfo对象包含网络连接的所有信息
+        //步骤3：根据需要取出网络连接信息
+        //获取WIFI连接的信息
+        NetworkInfo networkInfo = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        boolean isWifiConn = networkInfo.isConnected();
+
+        //获取移动数据连接的信息
+        networkInfo = connMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        boolean isMobileConn = networkInfo.isConnected();
+//        Toast.makeText(MainActivity.this, "Mobile:" + isMobileConn, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(MainActivity.this, "WiFi:" + isWifiConn, Toast.LENGTH_SHORT).show();
+        Log.d("info", "api<21 网络状况:" + "Mobile:" + isMobileConn + "WiFi:" + isWifiConn);
+        if (isMobileConn || isWifiConn) {
+            isConnectToNetwork = true;
+        }
+    }
+
+    //API版本23及以上时调用此方法进行网络的检测
+    //步骤非常类似
+    @TargetApi(21)
+    public void checkState_21orNew() {
+        //获得ConnectivityManager对象
+        ConnectivityManager connMgr = (ConnectivityManager) MainActivity.this.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        //获取所有网络连接的信息
+        Network[] networks = connMgr.getAllNetworks();
+        //用于存放网络连接信息
+        StringBuilder sb = new StringBuilder();
+        //通过循环将网络信息逐个取出来
+        for (int i = 0; i < networks.length; i++) {
+            //获取ConnectivityManager对象对应的NetworkInfo对象
+            NetworkInfo networkInfo = connMgr.getNetworkInfo(networks[i]);
+            sb.append(networkInfo.getTypeName() + " connect is " + networkInfo.isConnected() + " ");
+            if (networkInfo.getTypeName().equals("WIFI") || networkInfo.getTypeName().equals("MOBILE")) {
+                if (networkInfo.isConnected()) {
+                    isConnectToNetwork = true;
+                }
+            }
+        }
+//        Toast.makeText(MainActivity.this, sb.toString(), Toast.LENGTH_SHORT).show();
+        Log.d("info", "api>=21 网络状况:" + sb.toString());
+    }
+
+    public void checkInternet() {
+        isConnectToNetwork = false;
+        int apiLevel = Build.VERSION.SDK_INT;
+        if (apiLevel >= 21) {
+            checkState_21orNew();
+        } else {
+            checkState_21();
+        }
+        Log.d("info", "有网络连接:" + isConnectToNetwork);
+    }
+
+    public void toastNoNetwork() {
+//        Toast.makeText(MainActivity.this, "连不上网了……", Toast.LENGTH_LONG).show();
+        Snackbar.make(recyclerView, "连不上网了……", Snackbar.LENGTH_LONG)
+                .setAction("重试", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        checkInternet();
+                        if (isConnectToNetwork) {
+                            Toast.makeText(MainActivity.this, "连上网啦~", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .show();
+    }
 }

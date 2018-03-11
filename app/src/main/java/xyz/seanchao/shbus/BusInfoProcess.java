@@ -53,6 +53,9 @@ public class BusInfoProcess {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        if (doc == null) {
+            //TODO
+        }
         //提取<li>标签中的公交信息并格式化
         Elements li = doc.select("li");
         String busInfo = li.text()+" ";
@@ -328,6 +331,7 @@ public class BusInfoProcess {
         String jsonString = JSON.toJSONString(oBuses);
         System.out.println(jsonString);
     }
+
 
 }
 

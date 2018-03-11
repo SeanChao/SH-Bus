@@ -70,11 +70,8 @@ public class SingleBusAdapter extends RecyclerView.Adapter<SingleBusAdapter.View
             public void onClick(View v) {
                 int position = holder.getAdapterPosition();
                 SingleBus bus = mBusList.get(position);
-                String deltaTime = Utils.getDeltaTime(bus.getArrivalTime());
-                if (bus.getArrivalTime().equals("zZ-zZ")) {
-                    deltaTime = "暂无来车";
-                }
-                Snackbar.make(v, deltaTime, Snackbar.LENGTH_LONG).show();
+                String timeInfo = Utils.getDeltaTime(bus.getArrivalTime());
+                Snackbar.make(v, timeInfo, Snackbar.LENGTH_LONG).show();
                 //.setAction("Action", null).show();
             }
         });

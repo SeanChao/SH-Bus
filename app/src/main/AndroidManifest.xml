@@ -33,6 +33,18 @@
             android:name=".ChooseStopActivity"
             android:label="@string/title_activity_choose_stop"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <receiver android:name=".NetworkStateReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
     </application>
 
 </manifest>

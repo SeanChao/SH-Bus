@@ -70,11 +70,8 @@ public class BusAdapter extends RecyclerView.Adapter<BusAdapter.ViewHolder>{
                 intent.putExtra(BusActivity.BUS_NAME, bus.getName());
                 intent.putExtra(BusActivity.BUS_IMAGE_ID, bus.getImageId());
                 mContext.startActivity(intent);*/
-                String deltaTime = Utils.getDeltaTime(bus.getArrivalTime());
-                if (bus.getArrivalTime().equals("zZ-zZ")) {
-                    deltaTime = "暂无来车";
-                }
-                Snackbar.make(v, deltaTime, Snackbar.LENGTH_LONG).show();
+                String timeInfo = Utils.getDeltaTime(bus.getArrivalTime());
+                Snackbar.make(v, timeInfo, Snackbar.LENGTH_LONG).show();
             }
         });
         holder.cardView.setLongClickable(true);
