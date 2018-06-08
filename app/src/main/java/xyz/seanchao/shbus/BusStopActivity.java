@@ -91,12 +91,12 @@ public class BusStopActivity extends AppCompatActivity {
         getOnlineBusInfo(busId);
     }
 
-    private void getOnlineBusInfo(final String busId) {
+    private void getOnlineBusInfo(final String busFullId) {
         new Thread(new Runnable() {
             @Override
             public void run() {
 
-                String urlBase = "http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=bsq";
+                String urlBase = "http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=";
                 String url = urlBase + busId;
                 buses = BusInfoProcess.getBusByUrl(url);
                 busStopName = BusInfoProcess.getBusStopName(url);

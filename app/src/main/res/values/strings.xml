@@ -3,11 +3,12 @@
     <string name="activity_label">公交车到了吗</string>
 
     <string name="action_settings">设置</string>
+    <string name="action_about">关于</string>
     <string name="action_delete">删除</string>
     <string name="action_update">检查更新</string>
 
-    <string name="edit_text_hint_id">请输入站点id(如001,084,312...)</string>
-    <string name="edit_text_hint_name">请输入精确的车站名</string>
+    <string name="edit_text_hint_id">站点id(如001,084,312...)</string>
+    <string name="edit_text_hint_name">精确的车站名</string>
     <string name="title_activity_bus_stop">BusStopActivity</string>
 
     <string name="action_ok">确定</string>

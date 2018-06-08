@@ -6,8 +6,8 @@ android {
         applicationId "xyz.seanchao.shbus"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 2
-        versionName "1.1.0"
+        versionCode 3
+        versionName "1.2.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -44,10 +44,10 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:+'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:+'
 
-    compile 'org.jsoup:jsoup:+'
-    compile 'com.android.support:cardview-v7:27.1.0'
-    compile 'com.android.support:recyclerview-v7:27.1.0'
-    compile 'com.alibaba:fastjson:1.1.67.android'
-    compile 'com.yanzhenjie:recyclerview-swipe:+'
+    implementation 'org.jsoup:jsoup:+'
+    implementation 'com.android.support:cardview-v7:27.1.0'
+    implementation 'com.android.support:recyclerview-v7:27.1.0'
+    implementation 'com.alibaba:fastjson:1.1.67.android'
+    implementation 'com.yanzhenjie:recyclerview-swipe:+'
     implementation 'com.squareup.okhttp3:okhttp:+'
 }

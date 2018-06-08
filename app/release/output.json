@@ -6,13 +6,14 @@
     "apkInfo": {
       "type": "MAIN",
       "splits": [],
-      "versionCode": 2
+      "versionCode": 3,
+      "versionName": "1.2.0",
+      "enabled": true,
+      "outputFile": "app-release.apk",
+      "fullName": "release",
+      "baseName": "release"
     },
     "path": "app-release.apk",
-    "properties": {
-      "packageId": "xyz.seanchao.shbus",
-      "split": "",
-      "minSdkVersion": "16"
-    }
+    "properties": {}
   }
 ]

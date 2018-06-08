@@ -1,11 +1,9 @@
 package xyz.seanchao.shbus;
 
 import android.annotation.TargetApi;
-import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
@@ -31,8 +29,10 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.yanzhenjie.recyclerview.swipe.SwipeMenu;
@@ -170,29 +170,89 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initFab() {
+        String districtId = "";
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
                 dialog.setTitle("添加");
                 dialog.setCancelable(true);
                 LayoutInflater inflater = getLayoutInflater();
                 View dialogD = inflater.inflate(R.layout.edit_text_layout, (ViewGroup) findViewById(R.id.text_input_layout));
+                final Spinner spinner = dialogD.findViewById(R.id.spinner);
                 final EditText editText = (EditText) dialogD.findViewById(R.id.edit_text);
                 dialog.setView(dialogD);
                 dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String inputText = editText.getText().toString();
+                        String busId = "";
+                        Log.d("debug", "" + spinner.getSelectedItemPosition());
+                        switch (spinner.getSelectedItemPosition()) {
+                            case 0:
+                                busId += "hp";
+                                break;
+                            case 1:
+                                busId += "xh";
+                                break;
+                            case 2:
+                                busId += "ja";
+                                break;
+                            case 3:
+                                busId += "zb";
+                                break;
+                            case 4:
+                                busId += "pd";
+                                break;
+                            case 5:
+                                busId += "mh";
+                                break;
+                            case 6:
+                                busId += "bsq";
+                                break;
+                            case 7:
+                                busId += "sj";
+                                break;
+                            case 8:
+                                busId += "jd";
+                                break;
+                            case 9:
+                                busId += "yp";
+                                break;
+                            case 10:
+                                busId += "pt";
+                                break;
+                            case 11:
+                                busId += "fx";
+                                break;
+                            case 12:
+                                busId += "qp";
+                                break;
+                            case 13:
+                                busId += "cn";
+                                break;
+                            case 14:
+                                busId += "cm";
+                                break;
+                            case 15:
+                                busId += "hk";
+                                break;
+                            case 16:
+                                busId += "js";
+                                break;
+
+                        }
+                        busId += inputText;
                         Intent intent = null;
                         if (cb_id_checked) {
                             intent = new Intent(MainActivity.this, BusStopActivity.class);
-                            intent.putExtra("busId", inputText);
+                            intent.putExtra("busId", busId);
                             // intent.putExtra("flag", 1);
                         } else if (cb_name_chceked) {
                             intent = new Intent(MainActivity.this, ChooseStopActivity.class);
-                            intent.putExtra("busName", inputText);
+                            intent.putExtra("busName", busId);
                             //intent.putExtra("flag", 2);
                         }
                         startActivity(intent);
@@ -205,8 +265,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 //setupCheckBox
-                cb_id = (AppCompatCheckBox) dialogD.findViewById(R.id.cb_id);
-                cb_name = (AppCompatCheckBox) dialogD.findViewById(R.id.cb_name);
+                cb_id = dialogD.findViewById(R.id.cb_id);
+                cb_name = dialogD.findViewById(R.id.cb_name);
                 cb_id.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
@@ -228,6 +288,19 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+
+                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+                });
+
                 dialog.create().show();
             }
         });
@@ -245,7 +318,6 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        //getOnlineBusInfo(busId);
                         if (flag == 0) {
                             initFavFile();
                             singleAdapter.notifyDataSetChanged();
@@ -352,16 +424,8 @@ public class MainActivity extends AppCompatActivity {
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 break;
-            case R.id.action_settings:
-//                Snackbar.make(recyclerView, "得扎APP目前么撒好设置额", Snackbar.LENGTH_SHORT)
-//                        .setAction("不服", new View.OnClickListener() {
-//                            @Override
-//                            public void onClick(View view) {
-//                                Toast.makeText(MainActivity.this, "耐心等等啦~", Toast.LENGTH_SHORT).show();
-//                            }
-//                        })
-//                        .show();
-                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            case R.id.action_about:
+                Intent intent = new Intent(MainActivity.this, AboutActivity.class);
                 startActivity(intent);
                 break;
             case R.id.action_delete:
@@ -373,9 +437,6 @@ public class MainActivity extends AppCompatActivity {
                 updateBusStop();
                 Snackbar.make(recyclerView, "删除成功，重新打开生效", Snackbar.LENGTH_SHORT).show();
                 addMenuItem();
-                break;
-            case R.id.action_update:
-                checkUpdate();
                 break;
         }
         return super.onOptionsItemSelected(item);
