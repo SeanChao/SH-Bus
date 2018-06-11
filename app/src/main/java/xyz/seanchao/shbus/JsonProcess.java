@@ -129,7 +129,7 @@ public class JsonProcess {
         return jsonString;
     }
 
-    public static BusStop[] fromJsoninName(String jsonString) {
+    public static BusStop[] fromJsonInName(String jsonString) {
         BusStop[] busStops = new BusStop[2000];
         //init
         for (int i = 0; i < busStops.length; i++) {

@@ -6,6 +6,7 @@
     <string name="action_about">关于</string>
     <string name="action_delete">删除</string>
     <string name="action_update">检查更新</string>
+    <string name="action_money">打赏</string>
 
     <string name="edit_text_hint_id">站点id(如001,084,312...)</string>
     <string name="edit_text_hint_name">精确的车站名</string>

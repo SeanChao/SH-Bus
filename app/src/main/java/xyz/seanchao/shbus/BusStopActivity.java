@@ -86,7 +86,7 @@ public class BusStopActivity extends AppCompatActivity {
         });
 
         busId = intent.getStringExtra("busId");
-        Log.d("Debug", "busID;:" + busId);
+        Log.d("Debug", "busID:" + busId);
         //从BusInfoProcess中获取信息
         getOnlineBusInfo(busId);
     }
@@ -97,7 +97,7 @@ public class BusStopActivity extends AppCompatActivity {
             public void run() {
 
                 String urlBase = "http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=";
-                String url = urlBase + busId;
+                String url = urlBase + busFullId;
                 buses = BusInfoProcess.getBusByUrl(url);
                 busStopName = BusInfoProcess.getBusStopName(url);
                 //生成newBusStop
@@ -179,9 +179,7 @@ public class BusStopActivity extends AppCompatActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        switch (id) {
+        switch (item.getItemId()) {
             case R.id.action_done:
                 String cuttentData = load(file);
                 String newData = JsonProcess.toJson(newBusStop, cuttentData);

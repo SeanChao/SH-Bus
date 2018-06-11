@@ -66,7 +66,7 @@ public class BusStopAdapter extends RecyclerView.Adapter<BusStopAdapter.ViewHold
             public void onClick(View v) {
                 Context mContext = parent.getContext();
                 Intent intent = new Intent(mContext, BusStopActivity.class);
-                intent.putExtra("busId", mBusList.get(holder.getAdapterPosition()).getId());
+                intent.putExtra("busId", mBusList.get(holder.getAdapterPosition()).getDistrictAlias() + mBusList.get(holder.getAdapterPosition()).getId());
                 mContext.startActivity(intent);
             }
         });

@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean cb_id_checked = true;
     private boolean cb_name_chceked = false;
     public static boolean isConnectToNetwork = false;
+    public static String[] districtsAlias = {"hp", "xh", "ja", "zb", "pd", "mh", "bsq", "sj", "jd", "yp", "pt", "fx", "qp", "cn", "cm", "hk", "js"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,8 +100,10 @@ public class MainActivity extends AppCompatActivity {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
         }
 
-        checkInternet();
+        //适配旧版本
+        adaptOldVersion();
 
+        checkInternet();
         initFab();
 
         swipeRefresh = findViewById(R.id.swipe_refresh);
@@ -170,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initFab() {
-        String districtId = "";
+        final String districtId = "";
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -182,6 +185,10 @@ public class MainActivity extends AppCompatActivity {
                 LayoutInflater inflater = getLayoutInflater();
                 View dialogD = inflater.inflate(R.layout.edit_text_layout, (ViewGroup) findViewById(R.id.text_input_layout));
                 final Spinner spinner = dialogD.findViewById(R.id.spinner);
+                spinner.setSelection(0);
+                if (!load("district").equals("")) {
+                    spinner.setSelection(Integer.parseInt(load("district")));
+                }
                 final EditText editText = (EditText) dialogD.findViewById(R.id.edit_text);
                 dialog.setView(dialogD);
                 dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -190,71 +197,73 @@ public class MainActivity extends AppCompatActivity {
                         String inputText = editText.getText().toString();
                         String busId = "";
                         Log.d("debug", "" + spinner.getSelectedItemPosition());
-                        switch (spinner.getSelectedItemPosition()) {
-                            case 0:
-                                busId += "hp";
-                                break;
-                            case 1:
-                                busId += "xh";
-                                break;
-                            case 2:
-                                busId += "ja";
-                                break;
-                            case 3:
-                                busId += "zb";
-                                break;
-                            case 4:
-                                busId += "pd";
-                                break;
-                            case 5:
-                                busId += "mh";
-                                break;
-                            case 6:
-                                busId += "bsq";
-                                break;
-                            case 7:
-                                busId += "sj";
-                                break;
-                            case 8:
-                                busId += "jd";
-                                break;
-                            case 9:
-                                busId += "yp";
-                                break;
-                            case 10:
-                                busId += "pt";
-                                break;
-                            case 11:
-                                busId += "fx";
-                                break;
-                            case 12:
-                                busId += "qp";
-                                break;
-                            case 13:
-                                busId += "cn";
-                                break;
-                            case 14:
-                                busId += "cm";
-                                break;
-                            case 15:
-                                busId += "hk";
-                                break;
-                            case 16:
-                                busId += "js";
-                                break;
-
-                        }
-                        busId += inputText;
                         Intent intent = null;
                         if (cb_id_checked) {
+                            switch (spinner.getSelectedItemPosition()) {
+                                case 0:
+                                    busId += "hp";
+                                    break;
+                                case 1:
+                                    busId += "xh";
+                                    break;
+                                case 2:
+                                    busId += "ja";
+                                    break;
+                                case 3:
+                                    busId += "zb";
+                                    break;
+                                case 4:
+                                    busId += "pd";
+                                    break;
+                                case 5:
+                                    busId += "mh";
+                                    break;
+                                case 6:
+                                    busId += "bsq";
+                                    break;
+                                case 7:
+                                    busId += "sj";
+                                    break;
+                                case 8:
+                                    busId += "jd";
+                                    break;
+                                case 9:
+                                    busId += "yp";
+                                    break;
+                                case 10:
+                                    busId += "pt";
+                                    break;
+                                case 11:
+                                    busId += "fx";
+                                    break;
+                                case 12:
+                                    busId += "qp";
+                                    break;
+                                case 13:
+                                    busId += "cn";
+                                    break;
+                                case 14:
+                                    busId += "cm";
+                                    break;
+                                case 15:
+                                    busId += "hk";
+                                    break;
+                                case 16:
+                                    busId += "js";
+                                    break;
+
+                            }
+                            busId += inputText;
                             intent = new Intent(MainActivity.this, BusStopActivity.class);
                             intent.putExtra("busId", busId);
                             // intent.putExtra("flag", 1);
                         } else if (cb_name_chceked) {
                             intent = new Intent(MainActivity.this, ChooseStopActivity.class);
-                            intent.putExtra("busName", busId);
+                            intent.putExtra("busName", inputText);
+                            intent.putExtra("busDistrictAlias", districtsAlias[spinner.getSelectedItemPosition()]);
                             //intent.putExtra("flag", 2);
                         }
+                        save(spinner.getSelectedItemPosition() + "", "district");
                         startActivity(intent);
                     }
                 });
@@ -274,6 +283,9 @@ public class MainActivity extends AppCompatActivity {
                         cb_id_checked = isChecked;
                         if (isChecked) {
                             editText.setHint(R.string.edit_text_hint_id);
+                            if (districtId.equals("pd") || districtId.equals("js") || districtId.equals("mh") || districtId.equals("cm")) {
+                                editText.setHint("站点ID（如0021）");
+                            }
                         }
                     }
                 });
@@ -345,7 +357,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 //showRefresh();
-                String urlBase = "http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=bsq";
+                String urlBase = "http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=";
                 url = urlBase + busId;
                 buses = BusInfoProcess.getBusByUrl(url);
                 busStopName = BusInfoProcess.getBusStopName(url);
@@ -683,7 +695,7 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String urlBase = "http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=bsq";
+                String urlBase = "http://webapp.shbustong.com:56008/MobileWeb/ForecastChange.aspx?stopid=";
                 for (int i = 0; i < 32; i++) {
                     if (!singleBusStops[i].getId().equals("")) {
                         url = urlBase + singleBusStops[i].getId();
@@ -804,5 +816,38 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .show();
+    }
+
+    public void adaptOldVersion() {
+        String oldJsonString = load(favourite_file);
+        SingleBusStop[] singleBusStops = JsonProcess.fromJsonSingle(oldJsonString);
+        for (int i = 0; i < singleBusStops.length; i++) {
+            if (singleBusStops[i].getId().equals("")) {
+                continue;
+            }
+            Log.d("Debug", "index:" + i + ",id" + singleBusStops[i].getId());
+            boolean isOldId = singleBusStops[i].getId().matches("\\d{3}||\\d{4}");
+            Log.d("Debug", "index:" + i + ",isOldId:" + isOldId);
+            if (isOldId) {
+                singleBusStops[i].setId("bsq" + singleBusStops[i].getId());
+                Log.d("Debug", "new ID:" + singleBusStops[i].getId());
+            }
+        }
+        String newJsonString = JsonProcess.toJsonSingle(singleBusStops);
+        save(newJsonString, favourite_file);
+
+        //适配侧栏项目
+        BusStop[] oldStops = JsonProcess.fromJson(load(file));
+        for (int i = 0; i < oldStops.length; i++) {
+            if (oldStops[i].getId().equals("")) {
+                continue;
+            }
+            boolean isOldId2 = oldStops[i].getId().matches("\\d{3}||\\d{4}");
+            if (isOldId2) {
+                oldStops[i].setId("bsq" + oldStops[i].getId());
+            }
+        }
+        String newJsonString2 = JsonProcess.toJson(oldStops);
+        save(newJsonString2, file);
     }
 }

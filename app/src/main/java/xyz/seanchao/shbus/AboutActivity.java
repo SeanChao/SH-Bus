@@ -1,15 +1,23 @@
 package xyz.seanchao.shbus;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -30,6 +38,29 @@ public class AboutActivity extends AppCompatActivity {
         linearLayout = findViewById(R.id.about_linearlayout);
         versionText = findViewById(R.id.textview_version);
         versionText.setText(getCurrentVersionName());
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_about, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_money:
+                setContentView(R.layout.activity_about_money);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void checkUpdate(View v) {
@@ -83,4 +114,49 @@ public class AboutActivity extends AppCompatActivity {
         return versionName;
     }
 
+    public void onClick(View v) {
+        if (v.getId() == R.id.img_alipay) {
+            saveBitmap(v, "/storage/emulated/0/Pictures/Bus/alipay.jpg");
+        } else if (v.getId() == R.id.img_qq) {
+            saveBitmap(v, "/storage/emulated/0/Pictures/Bus/wx.png");
+        } else if (v.getId() == R.id.img_qq) {
+            saveBitmap(v, "/storage/emulated/0/Pictures/Bus/qq.png");
+        }
+    }
+
+    public static void saveBitmap(View view, String filePath) {
+
+        // 创建对应大小的bitmap
+        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(),
+                Bitmap.Config.RGB_565);
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+
+        //存储
+        FileOutputStream outStream = null;
+        File file = new File(filePath);
+        if (file.isDirectory()) {//如果是目录不允许保存
+            return;
+        }
+        try {
+            outStream = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+            outStream.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                bitmap.recycle();
+                if (outStream != null) {
+                    outStream.close();
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
 }
+

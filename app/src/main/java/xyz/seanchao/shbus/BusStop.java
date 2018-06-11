@@ -10,6 +10,16 @@ public class BusStop {
     String id;
     String address;
 
+    public String getDistrictAlias() {
+        return districtAlias;
+    }
+
+    public void setDistrictAlias(String districtAlias) {
+        this.districtAlias = districtAlias;
+    }
+
+    private String districtAlias;
+
     public String getAddress() {
         return address;
     }
@@ -31,6 +41,13 @@ public class BusStop {
         this.setId(id);
         this.setName(name);
         this.setAddress(address);
+    }
+
+    BusStop(String id, String name, String address, String districtAlias) {
+        this.setId(id);
+        this.setName(name);
+        this.setAddress(address);
+        this.setDistrictAlias(districtAlias);
     }
 
     public String getName() {

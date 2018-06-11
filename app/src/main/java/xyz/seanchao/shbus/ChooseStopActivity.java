@@ -1,10 +1,7 @@
 package xyz.seanchao.shbus;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,6 +20,7 @@ import okhttp3.Response;
 public class ChooseStopActivity extends AppCompatActivity {
 
     private String stopName;
+    private String districtAlias = "";
     BusStop[] busStops = new BusStop[2000];
     BusStop[] matchedBusStops = new BusStop[16];
     ProgressDialog progressDialog;
@@ -36,8 +34,6 @@ public class ChooseStopActivity extends AppCompatActivity {
         setContentView(R.layout.activity_choose_stop);
         toolbar = (Toolbar) findViewById(R.id.cb_toolbar);
         setSupportActionBar(toolbar);
-
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,8 +41,8 @@ public class ChooseStopActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
-
         stopName = getIntent().getStringExtra("busName");
+        districtAlias = getIntent().getStringExtra("busDistrictAlias");
         Log.d("Debug", toolbar.getTitle().toString());
         Log.d("Debug","stopName:"+stopName);
         progressDialog = new ProgressDialog(ChooseStopActivity.this);
@@ -67,21 +63,33 @@ public class ChooseStopActivity extends AppCompatActivity {
                     toolbar.setTitle(stopName);
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder()
-                            .url("http://app.seanchao.xyz/app/all_stop.json").build();
+                            .url("http://app.seanchao.xyz/app/all_stop_" + districtAlias + ".json").build();
                     Response response = client.newCall(request).execute();
                     responseData = response.body().string();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                busStops = JsonProcess.fromJsoninName(responseData);
+                busStops = JsonProcess.fromJsonInName(responseData);
                 matchedBusStops = new BusStop[16];
                 int index = 0;
                 for (int i = 0; i < busStops.length; i++) {
                     if (busStops[i].getName().equals(stopName)) {
                         matchedBusStops[index] = busStops[i];
+                        matchedBusStops[index].setDistrictAlias(districtAlias);
                         Log.d("Debug","matched stop["+index+"]:"+matchedBusStops[index].getName());
+                        Log.d("Debug", "index:" + index);
                         index ++;
                     }
+                }
+                if (index == 0) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(ChooseStopActivity.this, "未获取到信息", Toast.LENGTH_SHORT).show();
+                            onBackPressed();
+                        }
+                    });
+                    return;
                 }
                 for(int i = 0 ; i < matchedBusStops.length ; i++){
                     if (i > index - 1) {
