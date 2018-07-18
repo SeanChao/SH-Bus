@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">宝山公交查询</string>
+    <string name="app_name">公交车到了吗</string>
     <string name="activity_label">公交车到了吗</string>
+    <string name="app_description">开发者@SeanChao</string>
 
     <string name="action_settings">设置</string>
     <string name="action_about">关于</string>
